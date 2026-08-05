@@ -1,0 +1,85 @@
+{
+  "schema_version": "0.1",
+  "annotation_status": "draft",
+  "bench_name": "",
+  "version": "",
+  "aliases": [],
+  "annotators": [],
+  "last_updated": "",
+  "sources": [
+    {
+      "id": "",
+      "title": "",
+      "url": "",
+      "type": "",
+      "accessed_date": "",
+      "note": ""
+    }
+  ],
+  "core_question": {
+    "answer": "",
+    "evidence": [
+      {
+        "source_id": "",
+        "snippet": "",
+        "support": "direct",
+        "confidence": 0.0
+      }
+    ]
+  },
+  "motivation": {
+    "answer": "",
+    "evidence": []
+  },
+  "evaluated_capabilities": {
+    "answer": [],
+    "evidence": []
+  },
+  "benchmark_design": {
+    "data_source": "",
+    "task_construction": "",
+    "task_types": [],
+    "tools_or_environment": [],
+    "expert_involvement": "",
+    "evidence": []
+  },
+  "rubric_gold_scoring": {
+    "gold_definition": "",
+    "scoring_protocol": "",
+    "metrics": [],
+    "judge_type": "",
+    "human_review": "",
+    "evidence": []
+  },
+  "model_results": [
+    {
+      "model": "",
+      "metric": "",
+      "score": "",
+      "source_id": "",
+      "status": "missing",
+      "evidence": []
+    }
+  ],
+  "main_conclusions": [
+    {
+      "claim": "",
+      "evidence": []
+    }
+  ],
+  "failure_modes": [
+    {
+      "mode": "",
+      "explanation": "",
+      "evidence": []
+    }
+  ],
+  "reliability_notes": [
+    {
+      "note": "",
+      "evidence": []
+    }
+  ],
+  "annotator_notes": ""
+}
+

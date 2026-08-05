@@ -1079,3 +1079,138 @@ model = extractive-fallback
 - 工程链路已经接入完成，问题不在 pipeline，而在当前 API 额度/限流。
 - fallback 可以保证页面结构和工作流不断掉，但不能替代真实 LLM 分析。
 - 等 API 额度恢复或配置新的 provider 后，复跑同一 Bench 即可得到 `completed` 状态的真实 LLM 分析。
+
+## 2026-08-05：Phase 0 ARR 论文化任务定义与 Gold Note 框架
+
+目标：
+
+- 将项目从“Bench 分析 demo”推进到“可投稿 ARR 的研究项目”准备阶段。
+- 固定论文任务名：`Benchmark Understanding`。
+- 明确系统不是在评价 Bench 好坏，而是在自动理解 Bench 如何评价模型能力。
+- 建立人工 gold note 框架，为后续定量评估做准备。
+
+新增文件：
+
+```text
+docs/PAPER_PLAN.md
+docs/ANNOTATION_GUIDELINE.md
+data/gold_notes/template.json
+data/gold_notes/gdpval.gold.json
+```
+
+实现内容：
+
+- `docs/PAPER_PLAN.md`
+  - 固定 ARR 论文暂定题目：
+    - `Benchmark Understanding: Evidence-Grounded Analysis of Evaluation Benchmarks for Large Language Model Agents`
+  - 明确目标为 ARR October 2026 cycle。
+  - 记录官方 ARR 时间线：
+    - August 2026 submission: 2026-08-03
+    - October 2026 submission: 2026-10-12
+  - 定义研究问题：
+    - 自动恢复 Benchmark 论文核心研究逻辑。
+    - evidence grounding 是否提升可复核性。
+    - 统一 schema 是否支持横向比较。
+    - 系统是否降低研究者理解 Bench 的时间成本。
+  - 规划开发集与测试集：
+    - dev: GDPval, FAB, SpreadsheetBench v2
+    - test: APEX, FinSearchComp, OneMillion-Bench, IBFE, plus one benchmark
+  - 设计实验指标：
+    - Field Coverage
+    - Evidence Support Rate
+    - Table Extraction Quality
+    - Human Usefulness
+    - Time Saving
+  - 规划 baseline / ablation：
+    - Vanilla LLM Summary
+    - Paper-only Extraction
+    - No Evidence Grounding
+    - No Web
+    - No Table Parser
+    - Full System
+
+- `docs/ANNOTATION_GUIDELINE.md`
+  - 定义人工 gold note 的用途、标注单元、来源要求和证据要求。
+  - 逐项定义：
+    - core_question
+    - motivation
+    - evaluated_capabilities
+    - benchmark_design
+    - rubric_gold_scoring
+    - model_results
+    - main_conclusions
+    - failure_modes
+    - reliability_notes
+  - 定义证据质量：
+    - direct
+    - inferred
+    - unsupported
+  - 定义标注状态：
+    - draft
+    - reviewed
+    - adjudicated
+
+- `data/gold_notes/template.json`
+  - 新增通用 gold note JSON schema。
+  - 所有后续 Bench 的人工笔记都应从该模板复制。
+
+- `data/gold_notes/gdpval.gold.json`
+  - 新增 GDPval 第一版 gold note。
+  - 状态为 `draft`，表示可作为 schema 样例，但仍需人工二次复核。
+  - 当前覆盖：
+    - 核心问题
+    - 动机
+    - 评估能力
+    - Benchmark 设计
+    - rubric / gold / scoring
+    - 模型结果摘要
+    - 主要结论
+    - 失败模式
+    - 可靠性备注
+
+验证：
+
+```bash
+jq empty data/gold_notes/template.json
+jq empty data/gold_notes/gdpval.gold.json
+```
+
+结果：
+
+```text
+gold note json ok
+```
+
+复盘：
+
+- Phase 0 没有改 pipeline 和网页逻辑，重点是把论文方向和实验地基钉住。
+- 当前 GDPval gold note 是 draft，不应直接当成最终评估 gold。
+- 后续最关键的工作不是继续加 UI，而是让 gold notes 进入 reviewed/adjudicated 状态，并实现 system output vs gold note 的 evaluator。
+
+## 2026-08-05：公开分享链接模块
+
+目标：
+
+- 让任务页直接生成可发给师兄/协作者的公开服务器链接。
+- 避免用户在本地 `127.0.0.1` 链接和公开 `medai.sugarclaw.top` 链接之间手动换前缀。
+
+实现：
+
+- `web_app.py`
+  - 新增 `public_base_url()`：
+    - 优先读取环境变量 `BENCH_PUBLIC_BASE_URL`。
+    - 服务器输出目录为 `/opt/content-pipeline/...` 时，默认使用 `https://medai.sugarclaw.top/bench`。
+  - 新增任务页“发给师兄”分享卡片。
+  - 分享卡片包含：
+    - 任务控制台
+    - 中文简报
+    - 批量报告
+  - 每条链接都带复制按钮。
+
+- `docs/DEPLOY.md`
+  - 记录 `BENCH_PUBLIC_BASE_URL` 配置方式。
+
+复盘：
+
+- 本地未同步到服务器的任务不会默认显示公开链接，避免误导。
+- 线上 `/bench/jobs/{job_id}` 页面会自动展示公开分享链接。

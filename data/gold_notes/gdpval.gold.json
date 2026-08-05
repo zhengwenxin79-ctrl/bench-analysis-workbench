@@ -1,0 +1,266 @@
+{
+  "schema_version": "0.1",
+  "annotation_status": "draft",
+  "bench_name": "GDPval",
+  "version": "2025 public release / gold set",
+  "aliases": ["GDP val", "GDPval gold"],
+  "annotators": ["Codex draft; requires human review"],
+  "last_updated": "2026-08-05",
+  "sources": [
+    {
+      "id": "s1",
+      "title": "OpenAI GDPval announcement",
+      "url": "https://openai.com/index/gdpval/",
+      "type": "official",
+      "accessed_date": "2026-08-05",
+      "note": "Primary source for GDPval motivation, scope, task design, and scoring description."
+    },
+    {
+      "id": "s2",
+      "title": "openai/gdpval dataset",
+      "url": "https://huggingface.co/datasets/openai/gdpval",
+      "type": "dataset",
+      "accessed_date": "2026-08-05",
+      "note": "Dataset page discovered by the pipeline; should be reviewed directly before marking this note as reviewed."
+    },
+    {
+      "id": "s3",
+      "title": "hyeonsangjeon/gdpval-realworks",
+      "url": "https://github.com/hyeonsangjeon/gdpval-realworks",
+      "type": "github",
+      "accessed_date": "2026-08-05",
+      "note": "Third-party reproducibility and experiment repository discovered by the pipeline; useful for reproducibility notes, not a substitute for the official source."
+    }
+  ],
+  "core_question": {
+    "answer": "Can frontier models produce economically valuable real-world professional deliverables that experts judge competitive with human work?",
+    "evidence": [
+      {
+        "source_id": "s1",
+        "snippet": "introducing GDPval: a new evaluation designed to help us track how well our models and others perform on economically valuable, real-world tasks",
+        "support": "direct",
+        "confidence": 0.86
+      },
+      {
+        "source_id": "s1",
+        "snippet": "It measures model performance on tasks drawn directly from the real-world knowledge work of experienced professionals",
+        "support": "direct",
+        "confidence": 0.84
+      }
+    ]
+  },
+  "motivation": {
+    "answer": "GDPval is motivated by the gap between exam-style or short-answer benchmarks and the quality requirements of real occupational work products. It aims to evaluate whether models can complete economically valuable tasks, not only answer isolated questions.",
+    "evidence": [
+      {
+        "source_id": "s1",
+        "snippet": "classic academic benchmarks like MMLU (exam-style questions across dozens of subjects)",
+        "support": "direct",
+        "confidence": 0.76
+      },
+      {
+        "source_id": "s1",
+        "snippet": "providing a clearer picture on how models perform on economically valuable tasks",
+        "support": "direct",
+        "confidence": 0.82
+      }
+    ]
+  },
+  "evaluated_capabilities": {
+    "answer": [
+      "real-world professional deliverable generation",
+      "domain-specific reasoning across occupations",
+      "instruction following with reference files",
+      "artifact quality under expert review",
+      "long-form document, spreadsheet, presentation, diagram, plan, brief, and blueprint generation"
+    ],
+    "evidence": [
+      {
+        "source_id": "s1",
+        "snippet": "tasks drawn directly from the real-world knowledge work of experienced professionals across a wide range of occupations and sectors",
+        "support": "direct",
+        "confidence": 0.85
+      },
+      {
+        "source_id": "s1",
+        "snippet": "documents, slides, diagrams, spreadsheets, care plans, briefs, and blueprints",
+        "support": "direct",
+        "confidence": 0.8
+      }
+    ]
+  },
+  "benchmark_design": {
+    "data_source": "Tasks are drawn from real-world knowledge work across 9 U.S. GDP-linked industries and 44 occupations.",
+    "task_construction": "Each task asks a model to produce a professional work artifact using a prompt and associated reference files, rather than producing a short answer.",
+    "task_types": [
+      "documents",
+      "slides",
+      "diagrams",
+      "spreadsheets",
+      "care plans",
+      "briefs",
+      "blueprints"
+    ],
+    "tools_or_environment": [
+      "reference files",
+      "document generation",
+      "spreadsheet generation",
+      "presentation or slide generation"
+    ],
+    "expert_involvement": "Tasks are crafted and vetted by experienced professionals; task writers also create scoring rubrics.",
+    "evidence": [
+      {
+        "source_id": "s1",
+        "snippet": "GDPval covers tasks across 9 industries and 44 occupations",
+        "support": "direct",
+        "confidence": 0.86
+      },
+      {
+        "source_id": "s1",
+        "snippet": "The GDPval full set includes 1,320 specialized tasks (220 in the gold open-sourced set)",
+        "support": "direct",
+        "confidence": 0.88
+      },
+      {
+        "source_id": "s1",
+        "snippet": "each meticulously crafted and vetted by experienced professionals with over 14 years of experience on average",
+        "support": "direct",
+        "confidence": 0.84
+      }
+    ]
+  },
+  "rubric_gold_scoring": {
+    "gold_definition": "The gold reference is human expert work products and expert preference or quality judgments over model outputs versus human deliverables.",
+    "scoring_protocol": "Experts perform blind comparison between model outputs and human deliverables. Task-specific scoring rubrics are used to add consistency and transparency. Automated grading is described as an experimental direction rather than the sole scoring basis.",
+    "metrics": [
+      "expert preference",
+      "win rate or preference-style comparison",
+      "rubric-supported quality judgment"
+    ],
+    "judge_type": "human expert blind review, with automated grader as experimental support",
+    "human_review": "Yes. Expert human judgment is central to the evaluation.",
+    "evidence": [
+      {
+        "source_id": "s1",
+        "snippet": "Task writers also created detailed scoring rubrics for their occupations",
+        "support": "direct",
+        "confidence": 0.86
+      },
+      {
+        "source_id": "s1",
+        "snippet": "add consistency and transparency to the grading process",
+        "support": "direct",
+        "confidence": 0.82
+      }
+    ]
+  },
+  "model_results": [
+    {
+      "model": "not_cleanly_extracted_in_phase0",
+      "metric": "expert preference / quality comparison",
+      "score": "not recorded in this draft gold note",
+      "source_id": "s1",
+      "status": "reported_summary",
+      "evidence": [
+        {
+          "source_id": "s1",
+          "snippet": "Early GDPval results show that models can already take on some repetitive, well-specified tasks faster and at lower cost than experts.",
+          "support": "direct",
+          "confidence": 0.65
+        }
+      ]
+    }
+  ],
+  "main_conclusions": [
+    {
+      "claim": "Real-work benchmarks should evaluate usefulness and expert-perceived artifact quality, not only short-answer correctness.",
+      "evidence": [
+        {
+          "source_id": "s1",
+          "snippet": "Economically valuable, real-world tasks",
+          "support": "direct",
+          "confidence": 0.72
+        }
+      ]
+    },
+    {
+      "claim": "GDPval is intended to ground discussions of AI progress in evidence about occupational work.",
+      "evidence": [
+        {
+          "source_id": "s1",
+          "snippet": "help ground conversations about future AI improvements in evidence rather than guesswork",
+          "support": "direct",
+          "confidence": 0.84
+        }
+      ]
+    },
+    {
+      "claim": "The benchmark authors expect future versions to become more interactive and context-rich.",
+      "evidence": [
+        {
+          "source_id": "s1",
+          "snippet": "Future versions will extend to more interactive workflows and context-rich tasks",
+          "support": "direct",
+          "confidence": 0.86
+        }
+      ]
+    }
+  ],
+  "failure_modes": [
+    {
+      "mode": "professional detail omission",
+      "explanation": "Model outputs may look plausible while missing details that professional reviewers care about. This is an annotator synthesis from the benchmark's focus on expert artifact quality and needs a second-source check before review status.",
+      "evidence": [
+        {
+          "source_id": "s1",
+          "snippet": "real-world knowledge work of experienced professionals",
+          "support": "inferred",
+          "confidence": 0.55
+        }
+      ]
+    },
+    {
+      "mode": "long-artifact and formatting difficulty",
+      "explanation": "Because GDPval tasks include documents, slides, spreadsheets, diagrams, and other deliverables, models may fail on structure, formatting, and artifact-level constraints. This should be checked against the official limitations section before final use.",
+      "evidence": [
+        {
+          "source_id": "s1",
+          "snippet": "documents, slides, diagrams, spreadsheets, care plans, briefs, and blueprints",
+          "support": "inferred",
+          "confidence": 0.52
+        }
+      ]
+    },
+    {
+      "mode": "automated grading mismatch",
+      "explanation": "Automated grading may not fully capture expert quality judgments, especially for complex professional deliverables.",
+      "evidence": [
+        {
+          "source_id": "s1",
+          "snippet": "scoring rubrics",
+          "support": "inferred",
+          "confidence": 0.5
+        }
+      ]
+    }
+  ],
+  "reliability_notes": [
+    {
+      "note": "The full set is larger than the public gold set, so reproducibility depends on the released subset and available grading materials.",
+      "evidence": [
+        {
+          "source_id": "s1",
+          "snippet": "1,320 specialized tasks (220 in the gold open-sourced set)",
+          "support": "direct",
+          "confidence": 0.88
+        }
+      ]
+    },
+    {
+      "note": "This Phase 0 gold note is a draft based on the current system profile and source snippets. It should be reviewed against the official page, dataset card, and any technical report before being used as evaluation gold.",
+      "evidence": []
+    }
+  ],
+  "annotator_notes": "This is the first draft gold note used to validate the annotation schema. Model result rows are intentionally conservative because Phase 0 did not manually verify a clean GDPval leaderboard table."
+}
+

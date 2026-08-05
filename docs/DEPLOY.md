@@ -20,6 +20,8 @@ http://127.0.0.1:8765/
 - `HOST`: bind host. Default: `0.0.0.0`
 - `PORT` or `BENCH_PORT`: service port. Default: `8765`
 - `BENCH_OUTPUT_DIR`: job output directory. Default: `bench_analysis_outputs`
+- `BENCH_PUBLIC_BASE_URL`: public route used to render share links, for example
+  `https://medai.sugarclaw.top/bench`
 
 ## Render / Railway style deployment
 
