@@ -595,6 +595,34 @@ PostgreSQL
 - 种子库能看到该 Bench 的自动来源、手动来源、最新状态和最新报告入口。
 - 复跑同一 Bench 时会复用已保存来源。
 
+### Milestone 6：Evidence-grounded LLM Analysis
+
+目标：让系统不只做字段提取，还能基于证据帮助用户理解 Bench 论文。
+
+要实现：
+
+- 将 sources、raw text、paper-analysis evidence、model result candidates 压缩成 evidence pack。
+- 用 LLM 基于 evidence pack 生成中文深度分析。
+- 输出结构化 `llm_analysis`：
+  - 一句话判断
+  - 核心问题
+  - 提出动机
+  - 能力定位
+  - Benchmark 设计逻辑
+  - 评分协议解读
+  - 模型结果解读
+  - 失败模式诊断
+  - 可靠性判断
+  - unsupported claims / 人工复核点
+- HTML 报告新增“LLM 深度分析”区域。
+- 当 API 不可用时，明确标注 fallback，不伪装成 LLM 输出。
+
+验收标准：
+
+- 有可用 API key 时，LLM 分析状态为 `completed`。
+- API 不可用时，状态为 `fallback`，报告明确说明真实 LLM 未完成。
+- LLM 输出写入 `profile.json`，并进入单 Bench HTML 报告。
+
 ## 下一步实现建议
 
 优先级从高到低：
@@ -604,6 +632,7 @@ PostgreSQL
 3. 深化 Milestone 3：字段级 evidence、模型分数表格抽取和冲突处理。
 4. 实现 Milestone 4：Web 工作台和 HTML/JSON 导出。
 5. 完成 Milestone 5：种子库、回看列表和手动来源兜底。
+6. 推进 Milestone 6：证据驱动的 LLM 深度分析。
 
 ## 一句话概括
 

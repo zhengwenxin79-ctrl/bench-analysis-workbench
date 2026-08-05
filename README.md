@@ -10,6 +10,7 @@ The current system focuses on:
 - extracting paper-analysis fields such as motivation, benchmark design, rubric,
   scoring, model results, conclusions, and failure modes;
 - saving discovered and user-provided sources into a reusable seed library;
+- running evidence-grounded LLM analysis when an API key is available;
 - rendering Chinese web UI pages, batch comparison reports, single-benchmark
   reports, evidence review pages, and exportable HTML artifacts.
 
@@ -64,6 +65,9 @@ bench_analysis/
   fetch.py                  # fetch webpages, arXiv PDFs, README files, fallback mirrors
   extract.py                # extract benchmark metadata
   paper_analysis_extract.py # extract paper-note-style analysis fields
+  evidence_pack.py          # compress fetched sources into an LLM-ready evidence pack
+  llm_client.py             # DeepSeek/OpenAI-compatible JSON completion client
+  llm_analysis.py           # evidence-grounded LLM analysis schema and prompt
   results.py                # extract model result candidates
   reconcile.py              # merge sources, conflicts, confidence, localized brief
   render.py                 # batch and single-benchmark HTML reports

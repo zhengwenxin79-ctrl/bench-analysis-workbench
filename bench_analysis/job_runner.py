@@ -15,6 +15,7 @@ from .brief_render import write_brief, write_brief_index
 from .job_manifest import build_job_manifest, write_job_manifest
 from .job_paths import JobPaths, default_db_path
 from .job_store import JobStore
+from .llm_analysis import generate_llm_analysis
 from .paper_analysis_extract import extract_paper_analysis
 from .pipeline import analyze_bench, normalize_name, write_profile
 from .reconcile import reconcile_profile
@@ -32,6 +33,7 @@ JOB_STEPS = [
     "extract_paper_analysis",
     "extract_results",
     "reconcile",
+    "llm_analysis",
     "render_report",
 ]
 
@@ -226,6 +228,15 @@ def run_one_bench(
                 paper_analysis=paper_analysis,
             ),
         )
+        llm_analysis = _run_step(
+            store,
+            run_id,
+            "llm_analysis",
+            lambda: generate_llm_analysis(profile, documents),
+        )
+        profile.llm_analysis = llm_analysis
+        if llm_analysis.one_sentence:
+            profile.localized_brief.one_liner = llm_analysis.one_sentence
         store.upsert_bench_seed(
             slug=profile.slug,
             name=profile.name,

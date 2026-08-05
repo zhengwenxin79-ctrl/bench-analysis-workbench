@@ -988,3 +988,94 @@ HTTP smoke test：
   - source 级别的人工确认状态。
   - 已保存 profile 的“直接打开详情页”，而不只打开 artifact。
   - 搜索不到时在 job detail 中更明确地引导用户进入手动补充入口。
+
+## 2026-08-05：Milestone 6 Evidence-grounded LLM Analysis
+
+目标：
+
+- 在规则抽取之后加入 LLM，帮助用户从论文级角度理解 Bench。
+- LLM 不直接凭空回答，而是基于 evidence pack 做中文分析。
+
+实现：
+
+- 新增 `evidence_pack.py`
+  - 汇总 seeded profile、sources、PaperAnalysis evidence、model result candidates、raw document text。
+  - 控制 evidence pack 长度，避免一次喂入过长材料。
+
+- 新增 `llm_client.py`
+  - 支持 DeepSeek/OpenAI-compatible chat completions。
+  - 默认优先 DeepSeek；DeepSeek 不可用时 fallback 到 OpenAI。
+  - 支持 `BENCH_LLM_PROVIDER` 和 `BENCH_LLM_MODEL` 环境变量。
+  - 使用 JSON response format。
+
+- 新增 `llm_analysis.py`
+  - 生成中文 prompt。
+  - 输出结构化 `LLMAnalysis`：
+    - one sentence
+    - core question
+    - motivation
+    - evaluated capability
+    - benchmark design
+    - scoring
+    - model results
+    - failure modes
+    - reliability
+    - unsupported claims
+  - 当 API key 不可用、额度不足或限流时，生成明确的 `fallback` 状态，不伪装成真实 LLM。
+
+- `schema.py`
+  - 新增 `LLMAnswer`
+  - 新增 `LLMAnalysis`
+  - `BenchProfile` 增加 `llm_analysis`
+
+- `job_runner.py`
+  - 新增 step：`llm_analysis`
+  - 在 reconcile 之后、render 之前运行。
+  - 如果 LLM 生成 one_sentence，会更新 localized brief 的一句话简介。
+
+- `render.py`
+  - 单 Bench 报告新增“LLM 深度分析”区。
+  - 展示模型/provider、生成时间、一句话判断、各维度分析、证据 refs、置信度、人工复核点。
+  - fallback 状态下展示醒目的说明。
+
+- `web_app.py`
+  - 步骤中文名增加 `LLM 深度分析`。
+  - 种子库一句话简介优先读取 `llm_analysis.one_sentence`。
+
+本次运行验证：
+
+```bash
+python3 -m bench_analysis job-run GDPval --output-dir bench_analysis_outputs --discovery-limit 6 --fetch-limit 3
+```
+
+生成 job：
+
+```text
+20260805-111803-c2yy3
+```
+
+运行结果：
+
+- job 状态：`completed_with_warnings`
+- `profile.json` 已包含 `llm_analysis`
+- `report.html` 已包含 `LLM 深度分析`
+- 种子库 `gdpval` 已更新到最新 job
+
+实际 LLM 状态：
+
+```text
+status = fallback
+provider = local
+model = extractive-fallback
+```
+
+原因：
+
+- DeepSeek 返回 `402 Payment Required`
+- OpenAI 返回 `429 Too Many Requests`
+
+复盘：
+
+- 工程链路已经接入完成，问题不在 pipeline，而在当前 API 额度/限流。
+- fallback 可以保证页面结构和工作流不断掉，但不能替代真实 LLM 分析。
+- 等 API 额度恢复或配置新的 provider 后，复跑同一 Bench 即可得到 `completed` 状态的真实 LLM 分析。

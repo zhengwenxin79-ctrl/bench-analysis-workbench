@@ -197,6 +197,7 @@ STEP_LABELS = {
     "extract_paper_analysis": "抽取论文分析",
     "extract_results": "抽取模型结果",
     "reconcile": "合并与冲突处理",
+    "llm_analysis": "LLM 深度分析",
     "render_report": "生成报告",
 }
 
@@ -458,7 +459,9 @@ def _seed_one_liner(seed: dict) -> str:
     profile = _load_seed_profile(seed)
     localized_brief = profile.get("localized_brief", {})
     paper_analysis = profile.get("paper_analysis", {})
+    llm_analysis = profile.get("llm_analysis", {})
     candidates = [
+        llm_analysis.get("one_sentence", ""),
         localized_brief.get("one_liner", ""),
         profile.get("evaluates", ""),
         paper_analysis.get("core_question", ""),
