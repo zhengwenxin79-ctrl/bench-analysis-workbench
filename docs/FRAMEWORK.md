@@ -575,6 +575,26 @@ PostgreSQL
 - 网页能打开导出的 HTML 报告。
 - 输出报告可以直接分享或归档。
 
+### Milestone 5：Seed Library 与手动来源兜底
+
+目标：让系统不再是一次性搜索，而是能沉淀、复用和人工修正来源。
+
+要实现：
+
+- 建立 `bench_seeds` 种子数据库，保存每个 Bench 的自动来源、手动来源、最新任务和最新报告。
+- 每次 batch/job 完成后，将已发现 sources 写回种子库。
+- 下次分析同一个 Bench 时，优先复用种子库来源，再决定是否继续联网搜索。
+- Web UI 增加种子库列表，可查询、回看单个 Bench 的保存记录。
+- Web UI 增加手动来源入口，当网络搜索不到 Bench 时，用户可以输入 GitHub、arXiv、官网、PDF 或 leaderboard 链接。
+- 手动来源作为高优先级 seed source 进入抓取、抽取和报告生成。
+
+验收标准：
+
+- 用户能在网页保存一个 Bench 的手动链接。
+- 保存后能立即创建分析任务。
+- 种子库能看到该 Bench 的自动来源、手动来源、最新状态和最新报告入口。
+- 复跑同一 Bench 时会复用已保存来源。
+
 ## 下一步实现建议
 
 优先级从高到低：
@@ -583,6 +603,7 @@ PostgreSQL
 2. 稳定 Milestone 2：source discovery、raw cache 和抓取失败记录。
 3. 深化 Milestone 3：字段级 evidence、模型分数表格抽取和冲突处理。
 4. 实现 Milestone 4：Web 工作台和 HTML/JSON 导出。
+5. 完成 Milestone 5：种子库、回看列表和手动来源兜底。
 
 ## 一句话概括
 

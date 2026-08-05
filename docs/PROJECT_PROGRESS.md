@@ -915,3 +915,76 @@ HTTP smoke test：
   - 单 Bench report 全中文 schema 标签。
   - Evidence snippet 与 seed/manual summary 的来源区分。
   - 可折叠附录和 field-level review 操作。
+
+## 2026-08-05：Milestone 5 Seed Library 与手动来源兜底
+
+目标：
+
+- 建立一个可复用的 Bench 种子数据库，让用户不用每次都重新从网络搜索开始。
+- 当网络搜索不到 Bench 时，允许用户手动输入 GitHub、arXiv、官网、PDF 或 leaderboard 链接，再让 pipeline 基于这些来源继续分析。
+
+实现：
+
+- `job_store.py`
+  - 新增 `bench_seeds` SQLite 表。
+  - 保存字段包括：
+    - Bench slug/name/aliases
+    - 自动发现 sources
+    - 用户手动 manual sources
+    - notes
+    - latest job/run/profile/report/brief
+    - latest status
+    - created/updated/last searched time
+  - 新增：
+    - `upsert_bench_seed`
+    - `update_seed_artifacts`
+    - `get_bench_seed`
+    - `find_bench_seed`
+    - `list_bench_seeds`
+
+- `source_discovery.py`
+  - 新增 `source_record_from_url`
+  - 新增 `source_records_from_urls`
+  - 支持从用户输入链接自动判断 source type：
+    - arXiv -> paper
+    - GitHub -> github
+    - Hugging Face -> dataset
+    - PDF/OpenReview/ACL Anthology -> paper
+    - 其它 -> project
+
+- `job_runner.py`
+  - `JobOptions` 增加 `manual_sources`。
+  - 每次 Bench run 会先读取种子库：
+    - profile seed sources
+    - cached automatic sources
+    - manual sources
+  - discovery/fetch/extract 会优先使用这些种子来源。
+  - run 完成后把最新 sources 和 artifact 路径写回种子库。
+
+- `web_app.py`
+  - 首页新增“手动补充来源”表单。
+  - 首页新增种子库机制说明。
+  - 新增 `/seeds` 种子库列表：
+    - 查询 Bench
+    - 查看自动来源数量
+    - 查看手动来源数量
+    - 查看最新状态
+    - 打开最新报告/简报
+  - 新增 `/seeds/{slug}` 单 Bench 种子详情：
+    - 自动来源表
+    - 手动来源表
+    - 用种子来源复跑
+    - 继续补充手动来源
+  - 新增 `POST /seeds/manual`：
+    - 保存用户输入链接
+    - 可立即创建分析任务
+
+复盘：
+
+- 这一步把系统从“一次性 Bench 搜索工具”推进成了“有记忆的 Bench 分析系统”。
+- 手动来源不是临时参数，而是被持久化为高优先级 seed source。
+- 后续还需要继续补：
+  - 手动来源删除/编辑。
+  - source 级别的人工确认状态。
+  - 已保存 profile 的“直接打开详情页”，而不只打开 artifact。
+  - 搜索不到时在 job detail 中更明确地引导用户进入手动补充入口。

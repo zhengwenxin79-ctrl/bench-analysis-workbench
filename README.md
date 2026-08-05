@@ -9,6 +9,7 @@ The current system focuses on:
 - fetching webpages, arXiv PDFs, GitHub READMEs, and cached fallback pages;
 - extracting paper-analysis fields such as motivation, benchmark design, rubric,
   scoring, model results, conclusions, and failure modes;
+- saving discovered and user-provided sources into a reusable seed library;
 - rendering Chinese web UI pages, batch comparison reports, single-benchmark
   reports, evidence review pages, and exportable HTML artifacts.
 
@@ -25,6 +26,12 @@ Open:
 ```text
 http://127.0.0.1:8765/
 ```
+
+In the web UI:
+
+- use `新建批量分析` for normal batch jobs;
+- use `手动补充来源` when search cannot find a benchmark;
+- open `种子库` to review saved benchmark sources and rerun from cached/manual sources.
 
 Run a CLI batch:
 
@@ -62,6 +69,7 @@ bench_analysis/
   render.py                 # batch and single-benchmark HTML reports
   brief_render.py           # Chinese research brief pages
   web_app.py                # internal web UI
+  job_store.py              # jobs plus reusable bench seed library
 
 docs/
   FRAMEWORK.md
@@ -90,4 +98,3 @@ See `docs/DEPLOY.md` for server notes.
 This repository is the standalone version split from `content-pipeline`. The MVP
 is usable for internal demos, but evidence extraction, PDF table parsing,
 leaderboard parsing, and result verification still need continued hardening.
-
