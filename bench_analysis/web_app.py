@@ -159,6 +159,10 @@ th { background: #eef2f6; color: #334155; font-size: 13px; }
   font-size: 13px;
   background: #fbfcfd;
 }
+.one-liner {
+  max-width: 760px;
+  color: #334155;
+}
 @media (max-width: 780px) {
   header { display: block; }
   .grid, .two-col, .next-actions { grid-template-columns: 1fr; }
@@ -437,20 +441,50 @@ def _source_rows(sources: list[dict]) -> str:
     )
 
 
+def _load_seed_profile(seed: dict) -> dict:
+    profile_path = seed.get("latest_profile_json", "")
+    if not profile_path:
+        return {}
+    path = Path(profile_path)
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def _seed_one_liner(seed: dict) -> str:
+    profile = _load_seed_profile(seed)
+    localized_brief = profile.get("localized_brief", {})
+    paper_analysis = profile.get("paper_analysis", {})
+    candidates = [
+        localized_brief.get("one_liner", ""),
+        profile.get("evaluates", ""),
+        paper_analysis.get("core_question", ""),
+        paper_analysis.get("gap_claimed", ""),
+    ]
+    for value in candidates:
+        if value and not str(value).strip().lower().startswith("unknown"):
+            return str(value).strip()
+    if seed.get("manual_sources"):
+        return "已保存手动来源，建议基于这些链接运行一次分析生成简介。"
+    return "待分析：运行一次 Bench 分析后会生成一句话简介。"
+
+
 def render_seeds(app: BenchWebApp, query: str = "") -> bytes:
     seeds = app.store.list_bench_seeds(query=query, limit=200)
     rows = ""
     for seed in seeds:
         report_link = _seed_artifact_link(app, seed, "latest_report_html", "报告")
         brief_link = _seed_artifact_link(app, seed, "latest_brief_html", "简报")
+        one_liner = _seed_one_liner(seed)
         rows += (
             f"<tr><td><a href=\"/seeds/{escape(seed['slug'])}\">{escape(seed['name'])}</a></td>"
-            f"<td>{len(seed.get('sources', []))}</td><td>{len(seed.get('manual_sources', []))}</td>"
-            f"<td>{escape(status_label(seed.get('latest_status', '')) if seed.get('latest_status') else '待分析')}</td>"
-            f"<td>{escape(seed.get('updated_at', ''))}</td>"
+            f"<td class=\"one-liner\">{escape(one_liner)}</td>"
             f"<td>{report_link} {brief_link}</td></tr>"
         )
-    rows = rows or '<tr><td colspan="6" class="muted">还没有种子记录。</td></tr>'
+    rows = rows or '<tr><td colspan="3" class="muted">还没有种子记录。</td></tr>'
     body = f"""
 <header><div><h1>Bench 种子库</h1><div class="muted">保存每次搜索和手动补充的来源，支持回看与复用。</div></div><a href="/">返回工作台</a></header>
 <form class="panel actions" method="get" action="/seeds">
@@ -458,7 +492,7 @@ def render_seeds(app: BenchWebApp, query: str = "") -> bytes:
   <button class="secondary" type="submit">查询</button>
 </form>
 <table>
-  <thead><tr><th>Bench</th><th>自动来源</th><th>手动来源</th><th>最新状态</th><th>更新时间</th><th>最新产物</th></tr></thead>
+  <thead><tr><th>Bench</th><th>一句话简介</th><th>最新报告</th></tr></thead>
   <tbody>{rows}</tbody>
 </table>
 """
@@ -473,17 +507,13 @@ def render_seed_detail(app: BenchWebApp, slug: str) -> bytes:
     manual_rows = _source_rows(seed.get("manual_sources", [])) or '<tr><td colspan="4" class="muted">暂无手动来源。</td></tr>'
     report_link = _seed_artifact_link(app, seed, "latest_report_html", "打开最新报告")
     brief_link = _seed_artifact_link(app, seed, "latest_brief_html", "打开最新简报")
+    one_liner = _seed_one_liner(seed)
     body = f"""
 <header><div><h1>{escape(seed['name'])}</h1><div class="muted">种子记录 · {escape(seed['slug'])}</div></div><a href="/seeds">返回种子库</a></header>
 <section class="hero">
   <div class="eyebrow">Seed Record</div>
   <h1>{escape(seed['name'])}</h1>
-  <div class="grid">
-    <div class="kv"><b>自动来源</b>{len(seed.get('sources', []))}</div>
-    <div class="kv"><b>手动来源</b>{len(seed.get('manual_sources', []))}</div>
-    <div class="kv"><b>最新状态</b>{escape(status_label(seed.get('latest_status', '')) if seed.get('latest_status') else '待分析')}</div>
-    <div class="kv"><b>更新时间</b>{escape(seed.get('updated_at', ''))}</div>
-  </div>
+  <p class="one-liner">{escape(one_liner)}</p>
 </section>
 <div class="panel actions">
   <form class="inline-form" method="post" action="/seeds/manual">
